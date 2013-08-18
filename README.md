@@ -2,9 +2,9 @@
 
 # Goal
 
-Be able to configure CDI beans.
+Be able to declare CDI beans by configuration.
 
-It is useful for legacy libraries and avoids a bunch of producers.
+It is useful for legacy libraries (without beans.xml) and avoids a bunch of producers in some cases.
 
 # XML
 
