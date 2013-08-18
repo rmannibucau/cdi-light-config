@@ -73,6 +73,11 @@ In this case the configuration defines the factory configuration (fields). You c
 
 If the method is static no factory instance will be created.
 
+## Use constructor
+
+Simply add `use-constructor="true"` in the bean attributes. Here the attributes names are just used
+for documentation purpose.
+
 # Get the created beans
 
 By default you should be able to use:
