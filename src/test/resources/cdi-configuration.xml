@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<cdi-beans>
+  <foo class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean1">
+    <attributeBean1>bean1</attributeBean1>
+    <bean2><bar /></bean2>
+  </foo>
+  <bar class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2" scope="application">
+    <attributeBean2>bean2</attributeBean2>
+  </bar>
+  <qualified class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
+             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$MyNamed" />
+  <simpleBean class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
+             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Simple" />
+  <fromFactory class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean3"
+              factory-class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Factory"
+              qualifier="">
+    <name>factory</name>
+  </fromFactory>
+  <constructor use-constructor="true" class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean4">
+    <value>constructor</value>
+    <integer>1</integer>
+  </constructor>
+</cdi-beans>
