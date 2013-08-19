@@ -4,6 +4,7 @@ import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
+import javax.xml.namespace.QName;
 import java.beans.Introspector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -12,6 +13,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,27 +43,70 @@ public class ObjectFactory<T> {
         if (value == null || String.class.equals(type)) {
             return value;
         }
-        if (Integer.class.equals(type) || Integer.TYPE.equals(type)) {
-            return Integer.parseInt(value);
-        }
-        if (Long.class.equals(type) || Long.TYPE.equals(type)) {
-            return Long.parseLong(value);
-        }
-        if (Short.class.equals(type) || Short.TYPE.equals(type)) {
-            return Short.parseShort(value);
-        }
-        if (Boolean.class.equals(type) || Boolean.TYPE.equals(type)) {
-            return Boolean.parseBoolean(value);
-        }
-        if (Double.class.equals(type) || Double.TYPE.equals(type)) {
-            return Double.parseDouble(value);
-        }
-        if (Float.class.equals(type) || Float.TYPE.equals(type)) {
-            return Float.parseFloat(value);
-        }
-        if (Class.class.isInstance(type) && Class.class.cast(type).isArray()) {
-            final Class<?> componentType = Class.class.cast(type).getComponentType();
-            return toArray(componentType, value);
+        if (Class.class.isInstance(type)) {
+            final Class<?> rawType = Class.class.cast(type);
+
+            if (List.class.isAssignableFrom(rawType)) {
+                return Arrays.asList(toArray(String.class, value));
+            }
+            if (Set.class.isAssignableFrom(rawType)) {
+                final Set<Object> set = new HashSet<Object>();
+                set.addAll(Arrays.asList(toArray(String.class, value)));
+                return set;
+            }
+            if (Map.class.isAssignableFrom(rawType)) {
+                return toMap(value, String.class, String.class);
+            }
+            if (Integer.class.equals(type) || Integer.TYPE.equals(type)) {
+                return Integer.parseInt(value);
+            }
+            if (Long.class.equals(type) || Long.TYPE.equals(type)) {
+                return Long.parseLong(value);
+            }
+            if (Short.class.equals(type) || Short.TYPE.equals(type)) {
+                return Short.parseShort(value);
+            }
+            if (Boolean.class.equals(type) || Boolean.TYPE.equals(type)) {
+                return Boolean.parseBoolean(value);
+            }
+            if (Double.class.equals(type) || Double.TYPE.equals(type)) {
+                return Double.parseDouble(value);
+            }
+            if (Float.class.equals(type) || Float.TYPE.equals(type)) {
+                return Float.parseFloat(value);
+            }
+            if (rawType.isArray()) {
+                final Class<?> componentType = rawType.getComponentType();
+                return toArray(componentType, value);
+            }
+            if (URL.class.equals(rawType)) {
+                try {
+                    return new URL(value);
+                } catch (final MalformedURLException e) {
+                    throw new ConfigurationException(e);
+                }
+            }
+            if (URI.class.equals(rawType)) {
+                try {
+                    return new URL(value).toURI();
+                } catch (final Exception e) {
+                    throw new ConfigurationException(e);
+                }
+            }
+            if (QName.class.equals(rawType)) {
+                final int endIdx = value.indexOf("}");
+                if (value.startsWith("{") && endIdx > 0) {
+                    return new QName(value.substring(1, endIdx), value.substring(endIdx + 1));
+                }
+                return new QName(value);
+            }
+            if (Class.class.equals(rawType)) {
+                try {
+                    return Thread.currentThread().getContextClassLoader().loadClass(value);
+                } catch (final ClassNotFoundException e) {
+                    throw new ConfigurationException(e);
+                }
+            }
         }
         if (ParameterizedType.class.isInstance(type)) {
             final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
@@ -78,20 +125,6 @@ public class ObjectFactory<T> {
             if (Map.class.isAssignableFrom(rawType)) {
                 final Class<?> valueType = (Class<?>) actualTypeArguments[1];
                 return toMap(value, param, valueType);
-            }
-        } else if (Class.class.isInstance(type)) {
-            final Class<?> rawType = Class.class.cast(type);
-
-            if (List.class.isAssignableFrom(rawType)) {
-                return Arrays.asList(toArray(String.class, value));
-            }
-            if (Set.class.isAssignableFrom(rawType)) {
-                final Set<Object> set = new HashSet<Object>();
-                set.addAll(Arrays.asList(toArray(String.class, value)));
-                return set;
-            }
-            if (Map.class.isAssignableFrom(rawType)) {
-                return toMap(value, String.class, String.class);
             }
         }
 
