@@ -142,3 +142,22 @@ To be more concise you can set properties inline using property namespace:
 ```
 
 Just add `xmlns:p="property"` and prefix inline your properties name by this namespace (`p`).
+
+# Extensibility
+
+Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.NamespaceHandler`.
+
+You'll basically use the children `com.github.rmannibucau.cdi.configuration.xml.handlers.BeanHandler` and `com.github.rmannibucau.cdi.configuration.xml.handlers.PropertyHandler`.
+
+The first one will be used to add beans from a tag (same level as bean ones) and the second add add attributes from inline tags (as property one).
+
+A sample is provided through the webservice client handler. it allows you to create webservice clients inline:
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:ws="webservice">
+  <ws:myWs interface="com.github.rmannibucau.cdi.test.configuration.WebServiceConfigurationTest$WS"
+           service-qname="{http://configuration.test.cdi.rmannibucau.github.com/}WSImplService"
+           wsdl="http://127.0.0.1:4204/webservice-namespace/WSImpl?wsdl" /> <!-- port-qname optional -->
+</cdi-beans>
+```
