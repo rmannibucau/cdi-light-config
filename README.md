@@ -47,12 +47,15 @@ Here are the main use cases in a sample cdi-configuration.xml:
 
 ## Root tag
 
-Root tag name is not important but `cdi-beans` is recommanded.
+Root tag name is not important but `cdi-beans` is recommanded. It supports two main attributes:
+
+* default-scope: which defines the scope to use for all beans if noone is configured
+* default-qualifier: which defines the qualifier to use for all beans if noone is configured
 
 ## Simple bean
 
 Bean tag is its name (Bean name and name to use with @Named qualifier). To set attributes (from setter if possible or
-directly on fields if no setter exists) just add sub tags matching the name of the attribute with the expected value.
+directly on fields if no setter exists) just add sub tags matching the name of the attributes with the expected values.
 The value can be either a string (will be converted for primitives and String) or another tag matching another bean name.
 
 ## Change the qualifier
@@ -85,3 +88,35 @@ By default you should be able to use:
     @Inject
     @Named("foo")
     private ABean1 bean1;
+
+# Advanced configuration
+## Array, List, Set
+
+For these types use a comma separated values (CSV) format. For instance:
+
+    <?xml version="1.0"?>
+    <cdi-beans>
+      <array class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ArrayBean">
+        <array>1,2,3</array>
+      </array>
+      <list class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ListBean">
+        <list>1,2,3</list>
+      </list>
+      <set class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$SetBean">
+        <set>1,2,3</set>
+      </set>
+    </cdi-beans>
+
+Note: attributes needs to set types explicitely. For instance `List<?>` will not be settable correctly but `List<Integer>` will be.
+
+## Map
+
+With the same constraint (parameterized types needs to be set), you can initialize a map attribute using the CSV format
+and equal separator for keys/values:
+
+    <?xml version="1.0"?>
+    <cdi-beans>
+      <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
+        <map>1=v1,2=v2,3=v3</map>
+      </map>
+    </cdi-beans>

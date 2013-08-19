@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<cdi-beans default-scope="application" default-qualifier="com.github.rmannibucau.cdi.test.configuration.DefaultConfigurationTest$DefaultNamed">
+  <default use-constructor="true" class="com.github.rmannibucau.cdi.test.configuration.DefaultConfigurationTest$Configured">
+    <value>built</value>
+  </default>
+</cdi-beans>

@@ -22,6 +22,7 @@ public final class ConfigParser extends DefaultHandler {
     }
 
     private static interface Level {
+        static final int ROOT = 0;
         static final int BEAN = 1;
         static final int ATTRIBUTE = 2;
         static final int REF = 3;
@@ -33,6 +34,8 @@ public final class ConfigParser extends DefaultHandler {
     private ConfigBean bean = null;
     private StringBuilder text = null;
     private String ref = null;
+    private String defaultQualifier = null;
+    private String defaultScope = null;
 
     private ConfigParser() {
         // no-op
@@ -44,7 +47,7 @@ public final class ConfigParser extends DefaultHandler {
         if (level == Level.BEAN) {
             String scope = attributes.getValue("scope");
             if (scope == null) {
-                scope = "dependent";
+                scope = defaultScope;
             }
 
             final String classname = attributes.getValue("class");
@@ -54,11 +57,22 @@ public final class ConfigParser extends DefaultHandler {
 
             final boolean useConstructor = "true".equalsIgnoreCase(attributes.getValue("use-constructor"));
 
-            bean = new ConfigBean(localName, classname, scope, attributes.getValue("qualifier"),
+            String qualifier = attributes.getValue("qualifier");
+            if (qualifier == null) {
+                qualifier = defaultQualifier;
+            }
+
+            bean = new ConfigBean(localName, classname, scope, qualifier,
                 attributes.getValue("factory-class"), attributes.getValue("factory-method"),
                 useConstructor);
         } else if (level == Level.ATTRIBUTE) {
             text = new StringBuilder();
+        } else if (level == Level.ROOT) {
+            defaultQualifier = attributes.getValue("default-qualifier");
+            defaultScope = attributes.getValue("default-scope");
+            if (defaultScope == null) {
+                defaultScope = "dependent";
+            }
         }
         level++;
     }

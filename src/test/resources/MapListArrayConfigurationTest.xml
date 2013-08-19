@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<cdi-beans>
+  <array class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ArrayBean">
+    <array>1,2,3</array>
+  </array>
+  <list class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ListBean">
+    <list>1,2,3</list>
+  </list>
+  <set class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$SetBean">
+    <set>1,2,3</set>
+  </set>
+  <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
+    <map>1=1,2=2,3=3</map>
+  </map>
+</cdi-beans>

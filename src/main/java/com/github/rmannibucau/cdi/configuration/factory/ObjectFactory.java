@@ -5,12 +5,19 @@ import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import java.beans.Introspector;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class ObjectFactory<T> {
@@ -28,7 +35,7 @@ public class ObjectFactory<T> {
         return factory.create();
     }
 
-    private static Object convertTo(final Class<?> type, final String value) {
+    private static Object convertTo(final Type type, final String value) {
         if (value == null || String.class.equals(type)) {
             return value;
         }
@@ -50,17 +57,75 @@ public class ObjectFactory<T> {
         if (Float.class.equals(type) || Float.TYPE.equals(type)) {
             return Float.parseFloat(value);
         }
-        throw new ConfigurationException("Can't convert '" + value + "' to " + type.getName());
+        if (Class.class.isInstance(type) && Class.class.cast(type).isArray()) {
+            final Class<?> componentType = Class.class.cast(type).getComponentType();
+            return toArray(componentType, value);
+        }
+        if (ParameterizedType.class.isInstance(type)) {
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
+            final Class<?> rawType = Class.class.cast(parameterizedType.getRawType());
+            final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            final Class<?> param = (Class<?>) actualTypeArguments[0];
+
+            if (List.class.isAssignableFrom(rawType)) {
+                return Arrays.asList(toArray(param, value));
+            }
+            if (Set.class.isAssignableFrom(rawType)) {
+                final Set<Object> set = new HashSet<Object>();
+                set.addAll(Arrays.asList(toArray(param, value)));
+                return set;
+            }
+            if (Map.class.isAssignableFrom(rawType)) {
+                final Class<?> valueType = (Class<?>) actualTypeArguments[1];
+                return toMap(value, param, valueType);
+            }
+        } else if (Class.class.isInstance(type)) {
+            final Class<?> rawType = Class.class.cast(type);
+
+            if (List.class.isAssignableFrom(rawType)) {
+                return Arrays.asList(toArray(String.class, value));
+            }
+            if (Set.class.isAssignableFrom(rawType)) {
+                final Set<Object> set = new HashSet<Object>();
+                set.addAll(Arrays.asList(toArray(String.class, value)));
+                return set;
+            }
+            if (Map.class.isAssignableFrom(rawType)) {
+                return toMap(value, String.class, String.class);
+            }
+        }
+
+        throw new ConfigurationException("Can't convert '" + value + "' to " + type);
+    }
+
+    private static Map<?, ?> toMap(final String value, final Class<?> param, final Class<?> valueType) {
+        final Map<Object, Object> map = new HashMap<Object, Object>();
+        final String[] raw = value.split(",");
+        for (final String aRaw : raw) {
+            final String[] kv = aRaw.split("=");
+            if (kv.length == 1) {
+                map.put(convertTo(param, aRaw), null);
+            } else {
+                map.put(convertTo(param, kv[0]), convertTo(valueType, kv[1]));
+            }
+        }
+        return map;
+    }
+
+    private static Object[] toArray(final Class<?> componentType, final String value) {
+        final String[] raw = value.split(",");
+        final Object array = Array.newInstance(componentType, raw.length);
+        for (int i = 0; i < raw.length; i++) {
+            Array.set(array, i, convertTo(componentType, raw[i]));
+        }
+        return Object[].class.cast(array);
     }
 
     private Factory<T> findFactory() {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
-            final Class<T> clazz = (Class<T>) loader.loadClass(model.getClassname());
             if (model.getFactoryClass() == null && !model.isConstructor()) {
                 return new NewFactory<T>(model);
             }
-
             if (model.isConstructor()) {
                 return new ConstructorFactory<T>(model);
             }
@@ -77,7 +142,7 @@ public class ObjectFactory<T> {
     }
 
     protected static interface Setter {
-        Class<?> type();
+        Type type();
         void set(final Object mainInstance, final Object value) throws Exception;
     }
 
@@ -89,8 +154,8 @@ public class ObjectFactory<T> {
         }
 
         @Override
-        public Class<?> type() {
-            return field.getType();
+        public Type type() {
+            return field.getGenericType();
         }
 
         @Override
@@ -110,7 +175,7 @@ public class ObjectFactory<T> {
         }
 
         @Override
-        public Class<?> type() {
+        public Type type() {
             return method.getParameterTypes()[0];
         }
 

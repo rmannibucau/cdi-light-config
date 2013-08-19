@@ -6,6 +6,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
@@ -30,10 +31,14 @@ public class ConfigurationTest {
     @Deployment
     public static Archive<?> war() {
         return ShrinkWrap.create(WebArchive.class, "config.war")
+                    // extension
                     .addPackages(true, LightConfigurationExtension.class.getPackage().getName())
                     .addAsServiceProvider(Extension.class, LightConfigurationExtension.class)
+                    // test beans/config
                     .addClasses(ABean1.class, ABean2.class, Factory.class, ABean3.class, Simple.class, MyNamed.class)
                     .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                    .addAsResource(new ClassLoaderAsset(ConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml")
+                    // dependencies
                     .addAsLibraries(jarLocation(BeanProvider.class));
     }
 
