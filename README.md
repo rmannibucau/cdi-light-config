@@ -120,7 +120,7 @@ Note: attributes needs to set types explicitely. For instance `List<?>` will not
 With the same constraint (parameterized types needs to be set), you can initialize a map attribute using the CSV format
 and equal separator for keys/values:
 
-```
+```xml
 <?xml version="1.0"?>
 <cdi-beans>
   <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
