@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:p="property">
+  <inline class="com.github.rmannibucau.cdi.test.configuration.InlineConfigurationTest$Inline"
+          p:value="foo" />
+</cdi-beans>

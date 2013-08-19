@@ -17,6 +17,10 @@ public class ConfigBean {
     private final Map<String, String> refAttributes = new HashMap<String, String>();
     private final Collection<String> attributeOrder = new CopyOnWriteArrayList<String>();
 
+    public ConfigBean(final String name, final String classname, final String scope) {
+        this(name, classname, scope, null, null, null, false);
+    }
+
     public ConfigBean(final String name, final String classname, final String scope, final String qualifier,
                       final String factoryClass, final String factoryMethod,
                       final boolean constructor) {

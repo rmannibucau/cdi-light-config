@@ -128,3 +128,17 @@ and equal separator for keys/values:
   </map>
 </cdi-beans>
 ```
+
+# Inline property set
+
+To be more concise you can set properties inline using property namespace:
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:p="property">
+  <inline class="com.github.rmannibucau.cdi.test.configuration.InlineConfigurationTest$Inline"
+          p:value="foo" />
+</cdi-beans>
+```
+
+Just add `xmlns:p="property"` and prefix inline your properties name by this namespace (`p`).

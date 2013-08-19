@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 
 import javax.enterprise.inject.spi.Extension;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Qualifier;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -23,7 +22,6 @@ import java.lang.annotation.RetentionPolicy;
 import static org.apache.ziplock.JarLocation.jarLocation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 @RunWith(Arquillian.class)
@@ -37,7 +35,7 @@ public class DefaultConfigurationTest {
                     // test beans/config
                     .addClasses(Configured.class, DefaultNamed.class)
                     .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource(new ClassLoaderAsset(DefaultConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml")
+                    .addAsResource(new ClassLoaderAsset("test/" + DefaultConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml")
                     // dependencies
                     .addAsLibraries(jarLocation(BeanProvider.class));
     }
