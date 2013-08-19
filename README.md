@@ -16,34 +16,36 @@ Default behavior is to add bean of a type in CDI context with qualifier @Named.
 
 Here are the main use cases in a sample cdi-configuration.xml:
 
-    <?xml version="1.0"?>
-    <cdi-beans>
-      <foo class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean1">
-        <attributeBean1>bean1</attributeBean1>
-        <bean2><bar /></bean2>
-      </foo>
+```xml
+<?xml version="1.0"?>
+<cdi-beans>
+  <foo class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean1">
+    <attributeBean1>bean1</attributeBean1>
+    <bean2><bar /></bean2>
+  </foo>
 
-      <bar class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2" scope="application">
-        <attributeBean2>bean2</attributeBean2>
-      </bar>
+  <bar class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2" scope="application">
+    <attributeBean2>bean2</attributeBean2>
+  </bar>
 
-      <qualified class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
-                 qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$MyNamed" />
+  <qualified class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
+             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$MyNamed" />
 
-      <simpleBean class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
-                 qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Simple" />
+  <simpleBean class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
+             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Simple" />
 
-      <fromFactory class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean3"
-                  factory-class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Factory"
-                  qualifier="">
-        <name>factory</name>
-      </fromFactory>
-      <constructor use-constructor="true"
-                   class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean4">
-        <value>constructor</value>
-        <integer>1</integer>
-      </constructor>
-    </cdi-beans>
+  <fromFactory class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean3"
+              factory-class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Factory"
+              qualifier="">
+    <name>factory</name>
+  </fromFactory>
+  <constructor use-constructor="true"
+               class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean4">
+    <value>constructor</value>
+    <integer>1</integer>
+  </constructor>
+</cdi-beans>
+```
 
 ## Root tag
 
@@ -85,27 +87,31 @@ for documentation purpose.
 
 By default you should be able to use:
 
-    @Inject
-    @Named("foo")
-    private ABean1 bean1;
+```java
+@Inject
+@Named("foo")
+private ABean1 bean1;
+```
 
 # Advanced configuration
 ## Array, List, Set
 
 For these types use a comma separated values (CSV) format. For instance:
 
-    <?xml version="1.0"?>
-    <cdi-beans>
-      <array class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ArrayBean">
-        <array>1,2,3</array>
-      </array>
-      <list class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ListBean">
-        <list>1,2,3</list>
-      </list>
-      <set class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$SetBean">
-        <set>1,2,3</set>
-      </set>
-    </cdi-beans>
+```xml
+<?xml version="1.0"?>
+<cdi-beans>
+  <array class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ArrayBean">
+    <array>1,2,3</array>
+  </array>
+  <list class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ListBean">
+    <list>1,2,3</list>
+  </list>
+  <set class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$SetBean">
+    <set>1,2,3</set>
+  </set>
+</cdi-beans>
+```
 
 Note: attributes needs to set types explicitely. For instance `List<?>` will not be settable correctly but `List<Integer>` will be.
 
@@ -114,9 +120,11 @@ Note: attributes needs to set types explicitely. For instance `List<?>` will not
 With the same constraint (parameterized types needs to be set), you can initialize a map attribute using the CSV format
 and equal separator for keys/values:
 
-    <?xml version="1.0"?>
-    <cdi-beans>
-      <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
-        <map>1=v1,2=v2,3=v3</map>
-      </map>
-    </cdi-beans>
+```
+<?xml version="1.0"?>
+<cdi-beans>
+  <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
+    <map>1=v1,2=v2,3=v3</map>
+  </map>
+</cdi-beans>
+```
