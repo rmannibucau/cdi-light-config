@@ -10,7 +10,7 @@
 
   <groupId>com.github.rmannibucau</groupId>
   <artifactId>cdi-light-config</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <name>Light Configuration for CDI</name>
 
   <dependencies>
