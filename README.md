@@ -232,3 +232,19 @@ To be more concise you can set properties inline using property namespace:
 Just add `xmlns:p="property"` and prefix inline your properties name by this namespace (`p`).
 
 Note: for the value you can use `ref:name` to reference the bean with the name `name`.
+
+# Basic interpolation
+
+Thanks to Apache DeltaSpike `org.apache.deltaspike.core.spi.config.ConfigSource` you can interpolate some values.
+
+By default `META-INF/apache-deltaspike.properties` is read but you can add all the `ConfigSource` you want.
+
+Once you value configured it can be used in `cdi-configuration.xml`:
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:p="property">
+  <msg class="org.superbiz.Message"
+       p:message="${value}" />
+</cdi-beans>
+```

@@ -71,13 +71,13 @@ public abstract class CollectionHandler extends NamespaceHandlerSupport {
     }
 
     protected static class ItemsFactory<T> implements SetterFallback {
-        protected Class<?> type;
+        protected Class<T> type;
         protected final Map<String, String> listValues = new TreeMap<String, String>(new ItemComparator());
 
         protected List<T> doCreate() {
             final List<T> list = new ArrayList<T>();
             for (final String value : listValues.values()) {
-                list.add((T) convertTo(type, value));
+                list.add(type.cast(convertTo(type, value)));
             }
             return list;
         }

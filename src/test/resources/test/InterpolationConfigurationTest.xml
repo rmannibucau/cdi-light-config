@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:p="property">
+  <msg class="com.github.rmannibucau.cdi.test.configuration.InterpolationConfigurationTest$Message" p:message="${value}" />
+</cdi-beans>

@@ -2,6 +2,7 @@ package com.github.rmannibucau.cdi.configuration.factory;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.loader.ClassLoaders;
+import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import javax.xml.namespace.QName;
@@ -26,7 +27,8 @@ public final class Converter {
         // no-op
     }
 
-    public static Object convertTo(final Type type, final String value) {
+    public static Object convertTo(final Type type, final String rawValue) {
+        final String value = interpolate(rawValue);
         if (value == null || String.class.equals(type) || Object.class.equals(type)) {
             return value;
         }
@@ -134,6 +136,16 @@ public final class Converter {
         }
 
         throw new ConfigurationException("Can't convert '" + value + "' to " + type);
+    }
+
+    private static String interpolate(final String rawValue) {
+        if (rawValue == null) {
+            return null;
+        }
+        if (rawValue.startsWith("${") && rawValue.endsWith("}")) {
+            return ConfigResolver.getPropertyValue(rawValue.substring(2, rawValue.length() - 1), rawValue);
+        }
+        return rawValue;
     }
 
     private static Map<?, ?> toMap(final String value, final Class<?> param, final Class<?> valueType) {

@@ -32,6 +32,10 @@ public class ObjectFactory<T> {
         return factory.create();
     }
 
+    public Class<?> targetClass() {
+        return factory.beanClass();
+    }
+
     private Factory<T> findFactory() {
         try {
             if (model.getFactoryClass() == null && !model.isConstructor()) {
@@ -101,6 +105,7 @@ public class ObjectFactory<T> {
 
     protected static interface Factory<T> {
         T create();
+        Class<?> beanClass();
     }
 
     protected static class ConstructorFactory<T> implements Factory<T> {
@@ -147,6 +152,11 @@ public class ObjectFactory<T> {
             } catch (final Exception e) {
                 throw new ConfigurationException(e);
             }
+        }
+
+        @Override
+        public Class<?> beanClass() {
+            return constructor.getDeclaringClass();
         }
 
         private Object findAttribute(final Class<?> clazz, final String attr) {
@@ -205,6 +215,11 @@ public class ObjectFactory<T> {
             } catch (final Exception e) {
                 throw new ConfigurationException(e);
             }
+        }
+
+        @Override
+        public Class<?> beanClass() {
+            return clazz;
         }
 
         private Map<String, Setter> mapMembers(final Class<T> target) {
@@ -266,6 +281,11 @@ public class ObjectFactory<T> {
             } catch (final Exception e) {
                 throw new ConfigurationException(e);
             }
+        }
+
+        @Override
+        public Class<?> beanClass() {
+            return method.getReturnType();
         }
     }
 }

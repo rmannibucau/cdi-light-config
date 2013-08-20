@@ -53,13 +53,13 @@ public class ConfigurationTest {
     @Test
     public void constructor() {
         assertNotNull(constructor);
-        assertNotNull("constructor1", constructor.getValue());
+        assertEquals("constructor1", constructor.getValue());
     }
 
     @Test
     public void factory() {
         assertNotNull(fromFactory);
-        assertNotNull("factory", fromFactory.name());
+        assertEquals("factory", fromFactory.name());
     }
 
     @Test
