@@ -3,8 +3,6 @@ package com.github.rmannibucau.cdi.test.configuration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,10 +18,8 @@ import static org.junit.Assert.assertNotNull;
 public class WebServiceConfigurationTest {
     @Deployment
     public static Archive<?> war() {
-        return ShrinkWraps.base("webservice-namespace.war")
-                    .addClasses(WS.class, WSImpl.class)
-                    .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource(new ClassLoaderAsset("test/" + WebServiceConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml");
+        return ShrinkWraps.base(WebServiceConfigurationTest.class)
+                    .addClasses(WS.class, WSImpl.class);
     }
 
     @Inject

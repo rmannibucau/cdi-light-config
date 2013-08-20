@@ -1,5 +1,6 @@
 package com.github.rmannibucau.cdi.configuration.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ConfigBean {
     private final String name;
     private final String classname;
+    private final Collection<String> typeParameters = new ArrayList<String>(1);
     private final String factoryClass;
     private final String factoryMethod;
     private final String scope;
@@ -43,6 +45,10 @@ public class ConfigBean {
 
     public String getClassname() {
         return classname;
+    }
+
+    public Collection<String> getTypeParameters() {
+        return typeParameters;
     }
 
     public String getFactoryClass() {

@@ -20,11 +20,9 @@ import static org.junit.Assert.assertNotNull;
 public class CustomHandlerTest {
     @Deployment
     public static Archive<?> war() {
-        return ShrinkWraps.base("custom-handler.war")
+        return ShrinkWraps.base(CustomHandlerTest.class)
                     .addClasses(SingletonBean.class, CustomHandler.class)
-                    .addAsServiceProvider(NamespaceHandler.class, CustomHandler.class)
-                    .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource(new ClassLoaderAsset("test/" + CustomHandlerTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml");
+                    .addAsServiceProvider(NamespaceHandler.class, CustomHandler.class);
     }
 
     @Inject

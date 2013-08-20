@@ -2,6 +2,7 @@ package com.github.rmannibucau.cdi.configuration.xml.handlers;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
+import com.github.rmannibucau.cdi.loader.ClassLoaders;
 import org.xml.sax.Attributes;
 
 import javax.xml.namespace.QName;
@@ -27,13 +28,6 @@ public class WebServiceHandler extends NamespaceHandlerSupport {
         return bean;
     }
 
-    private static String scope(final String scope) {
-        if (scope == null) { // default is application for performances reason, to change with WSSecurity to avoid thread safety issues
-            return "application";
-        }
-        return scope;
-    }
-
     public static class WebServiceFactory<T> {
         private String interfaceName;
         private QName serviceQName;
@@ -44,7 +38,7 @@ public class WebServiceHandler extends NamespaceHandlerSupport {
             final Service service = Service.create(url, serviceQName);
             final Class<T> itf;
             try {
-                itf = (Class<T>) Thread.currentThread().getContextClassLoader().loadClass(interfaceName);
+                itf = (Class<T>) ClassLoaders.tccl().loadClass(interfaceName);
             } catch (ClassNotFoundException e) {
                 throw new ConfigurationException(e);
             }

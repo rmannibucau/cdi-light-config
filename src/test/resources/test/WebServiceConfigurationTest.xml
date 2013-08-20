@@ -2,5 +2,5 @@
 <cdi-beans xmlns:ws="webservice">
   <ws:myWs interface="com.github.rmannibucau.cdi.test.configuration.WebServiceConfigurationTest$WS"
            service-qname="{http://configuration.test.cdi.rmannibucau.github.com/}WSImplService"
-           wsdl="http://127.0.0.1:4204/webservice-namespace/WSImpl?wsdl" />
+           wsdl="http://127.0.0.1:4204/WebServiceConfigurationTest/WSImpl?wsdl" />
 </cdi-beans>

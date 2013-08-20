@@ -1,12 +1,14 @@
 package com.github.rmannibucau.cdi.configuration.factory;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
+import com.github.rmannibucau.cdi.loader.ClassLoaders;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -18,15 +20,14 @@ import java.util.Map;
 import java.util.Set;
 
 public final class Converter {
-
-    public static final String REF_PREFIX = "ref:";
+    private static final String REF_PREFIX = "ref:";
 
     private Converter() {
         // no-op
     }
 
     public static Object convertTo(final Type type, final String value) {
-        if (value == null || String.class.equals(type)) {
+        if (value == null || String.class.equals(type) || Object.class.equals(type)) {
             return value;
         }
         if (Class.class.isInstance(type)) {
@@ -88,7 +89,7 @@ public final class Converter {
             }
             if (Class.class.equals(rawType)) {
                 try {
-                    return Thread.currentThread().getContextClassLoader().loadClass(value);
+                    return ClassLoaders.tccl().loadClass(value);
                 } catch (final ClassNotFoundException e) {
                     throw new ConfigurationException(e);
                 }
@@ -97,8 +98,22 @@ public final class Converter {
         if (ParameterizedType.class.isInstance(type)) {
             final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
             final Class<?> rawType = Class.class.cast(parameterizedType.getRawType());
+
+            if (Class.class.equals(rawType)) {
+                try {
+                    return ClassLoaders.tccl().loadClass(value);
+                } catch (final ClassNotFoundException e) {
+                    throw new ConfigurationException(e);
+                }
+            }
+
             final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            final Class<?> param = (Class<?>) actualTypeArguments[0];
+            final Class<?> param;
+            if (actualTypeArguments.length == 0 || WildcardType.class.isInstance(actualTypeArguments[0])) {
+                param = Object.class;
+            } else {
+                param = (Class<?>) actualTypeArguments[0];
+            }
 
             if (List.class.isAssignableFrom(rawType)) {
                 return Arrays.asList(toArray(param, value));

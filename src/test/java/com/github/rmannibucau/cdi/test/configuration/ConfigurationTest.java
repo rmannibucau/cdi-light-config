@@ -4,8 +4,6 @@ import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,10 +23,8 @@ import static org.junit.Assert.assertSame;
 public class ConfigurationTest {
     @Deployment
     public static Archive<?> war() {
-        return ShrinkWraps.base("base-configuration.war")
-                    .addClasses(ABean1.class, ABean2.class, Factory.class, ABean3.class, Simple.class, MyNamed.class)
-                    .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource(new ClassLoaderAsset("test/" + ConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml");
+        return ShrinkWraps.base(ConfigurationTest.class)
+                    .addClasses(ABean1.class, ABean2.class, Factory.class, ABean3.class, Simple.class, MyNamed.class);
     }
 
     @Inject

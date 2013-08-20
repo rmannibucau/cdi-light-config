@@ -2,8 +2,12 @@ package com.github.rmannibucau.cdi.configuration.xml;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.ArrayHandler;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.ListHandler;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.MapHandler;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.PropertyHandler;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.SetHandler;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.WebServiceHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -32,6 +36,10 @@ public final class ConfigParser extends DefaultHandler {
             // defaults
         HANDLERS.put("property", new PropertyHandler());
         HANDLERS.put("webservice", new WebServiceHandler());
+        HANDLERS.put("list", new ListHandler());
+        HANDLERS.put("set", new SetHandler());
+        HANDLERS.put("array", new ArrayHandler());
+        HANDLERS.put("map", new MapHandler());
             // extensions
         for (final NamespaceHandler handler : ServiceLoader.load(NamespaceHandler.class)) {
             HANDLERS.put(handler.supportedUri(), handler);

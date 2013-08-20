@@ -13,4 +13,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
     public ConfigBean createBean(final String localName, final Attributes attributes) {
         throw new UnsupportedOperationException("this handler doesn't support bean tag");
     }
+
+    protected static String scope(final String scope) {
+        if (scope == null) {
+            return "dependent";
+        }
+        return scope;
+    }
 }

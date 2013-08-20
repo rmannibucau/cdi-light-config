@@ -143,6 +143,8 @@ To be more concise you can set properties inline using property namespace:
 
 Just add `xmlns:p="property"` and prefix inline your properties name by this namespace (`p`).
 
+Note: for the value you can use `ref:name` to reference the bean with the name `name`.
+
 # Extensibility
 
 Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler`.

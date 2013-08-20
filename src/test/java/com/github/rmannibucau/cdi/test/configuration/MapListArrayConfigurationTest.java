@@ -3,8 +3,6 @@ package com.github.rmannibucau.cdi.test.configuration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -24,10 +22,8 @@ import static org.junit.Assert.assertTrue;
 public class MapListArrayConfigurationTest {
     @Deployment
     public static Archive<?> war() {
-        return ShrinkWraps.base("map-list-config.war")
-                    .addClasses(ListBean.class)
-                    .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource(new ClassLoaderAsset("test/" + MapListArrayConfigurationTest.class.getSimpleName() + ".xml"), "cdi-configuration.xml");
+        return ShrinkWraps.base(MapListArrayConfigurationTest.class)
+                    .addClasses(ListBean.class);
     }
 
     @Inject

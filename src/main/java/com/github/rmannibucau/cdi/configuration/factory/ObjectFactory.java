@@ -2,6 +2,7 @@ package com.github.rmannibucau.cdi.configuration.factory;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
+import com.github.rmannibucau.cdi.loader.ClassLoaders;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import java.beans.Introspector;
@@ -40,7 +41,7 @@ public class ObjectFactory<T> {
                 return new ConstructorFactory<T>(model);
             }
 
-            final Class<?> factoryClass = Thread.currentThread().getContextClassLoader().loadClass(model.getFactoryClass());
+            final Class<?> factoryClass = ClassLoaders.tccl().loadClass(model.getFactoryClass());
             final Method method = factoryClass.getDeclaredMethod(model.getFactoryMethod());
             if (!method.isAccessible()) {
                 method.setAccessible(true);
@@ -111,7 +112,7 @@ public class ObjectFactory<T> {
 
             final Class<?> clazz;
             try {
-                clazz = Thread.currentThread().getContextClassLoader().loadClass(bean.getClassname());
+                clazz = ClassLoaders.tccl().loadClass(bean.getClassname());
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException(e);
             }
@@ -167,7 +168,7 @@ public class ObjectFactory<T> {
         public NewFactory(final ConfigBean model) {
             this.model = model;
             try {
-                this.clazz = (Class<T>) Thread.currentThread().getContextClassLoader().loadClass(model.getClassname());
+                this.clazz = (Class<T>) ClassLoaders.tccl().loadClass(model.getClassname());
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException(e);
             }
@@ -184,6 +185,8 @@ public class ObjectFactory<T> {
                     if (field != null) {
                         final Object value = convertTo(field.type(), attribute.getValue());
                         field.set(t, value);
+                    } else if (SetterFallback.class.isInstance(t)) {
+                        SetterFallback.class.cast(t).set(attribute.getKey(), attribute.getValue());
                     } else {
                         LOGGER.warning("Can't find field " + attribute.getKey());
                     }
@@ -225,7 +228,7 @@ public class ObjectFactory<T> {
                 }
 
                 current = current.getSuperclass();
-            } while (current != null && Object.class.equals(current));
+            } while (current != null && !Object.class.equals(current));
             return members;
         }
     }
