@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:set="set">
+  <set:empty type="java.lang.String" />
+  <set:three type="java.lang.Integer" item-0="0" item-1="2" item-2="4" item-3="4" />
+</cdi-beans>

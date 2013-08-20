@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:list="list">
+  <list:empty type="java.lang.String" />
+  <list:three type="java.lang.Integer" item-0="0" item-1="2" item-2="4" />
+</cdi-beans>
