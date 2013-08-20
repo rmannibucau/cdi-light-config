@@ -1,7 +1,7 @@
 package com.github.rmannibucau.cdi.test.configuration;
 
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
-import com.github.rmannibucau.cdi.configuration.xml.NamespaceHandler;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -13,8 +13,6 @@ import org.xml.sax.Attributes;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Arrays;
-import java.util.Collection;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -47,17 +45,22 @@ public class CustomHandlerTest {
         }
     }
 
-    public static class CustomHandler implements NamespaceHandler<Attributes> {
+    public static class CustomHandler implements NamespaceHandler {
         @Override
-        public boolean support(final String uri) {
-            return "custom".equals(uri);
+        public String supportedUri() {
+            return "custom";
         }
 
         @Override
-        public Collection<ConfigBean> parse(final ConfigBean bean, final String key, final Attributes value) {
+        public void decorate(final ConfigBean bean, final String localName, final String value) {
+            // no-op
+        }
+
+        @Override
+        public ConfigBean createBean(final String localName, final Attributes attributes) {
             final ConfigBean configBean = new ConfigBean("singleton", SingletonBean.class.getName(), "application");
-            configBean.getDirectAttributes().put("value", value.getValue("default"));
-            return Arrays.asList(configBean);
+            configBean.getDirectAttributes().put("value", attributes.getValue("default"));
+            return configBean;
         }
     }
 }

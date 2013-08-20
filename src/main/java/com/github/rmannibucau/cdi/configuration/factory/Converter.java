@@ -1,6 +1,7 @@
 package com.github.rmannibucau.cdi.configuration.factory;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Array;
@@ -17,6 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 public final class Converter {
+
+    public static final String REF_PREFIX = "ref:";
+
     private Converter() {
         // no-op
     }
@@ -108,6 +112,10 @@ public final class Converter {
                 final Class<?> valueType = (Class<?>) actualTypeArguments[1];
                 return toMap(value, param, valueType);
             }
+        }
+
+        if (value.startsWith("ref:")) {
+            return BeanProvider.getContextualReference(value.substring(REF_PREFIX.length()));
         }
 
         throw new ConfigurationException("Can't convert '" + value + "' to " + type);

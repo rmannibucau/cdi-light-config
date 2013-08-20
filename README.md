@@ -145,9 +145,11 @@ Just add `xmlns:p="property"` and prefix inline your properties name by this nam
 
 # Extensibility
 
-Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.NamespaceHandler`.
+Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler`.
 
-You'll basically use the children `com.github.rmannibucau.cdi.configuration.xml.handlers.BeanHandler` and `com.github.rmannibucau.cdi.configuration.xml.handlers.PropertyHandler`.
+You'll basically use the child `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandlerSupport` since
+`NamespaceHandler` supports two kind of handling: attribute handling like properties and bean handling (shortcut to create a bean).
+`NamespaceHandlerSupport` just throw an exception if the handler is used for a part it shouldn't handle.
 
 The first one will be used to add beans from a tag (same level as bean ones) and the second add add attributes from inline tags (as property one).
 

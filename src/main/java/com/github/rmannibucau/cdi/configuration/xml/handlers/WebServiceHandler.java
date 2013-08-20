@@ -7,17 +7,15 @@ import org.xml.sax.Attributes;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
-public class WebServiceHandler extends BeanHandler {
+public class WebServiceHandler extends NamespaceHandlerSupport {
     @Override
-    public boolean support(final String uri) {
-        return "webservice".equals(uri);
+    public String supportedUri() {
+        return "webservice";
     }
 
     @Override
-    protected Collection<ConfigBean> createBeans(final String localName, final Attributes attributes) {
+    public ConfigBean createBean(final String localName, final Attributes attributes) {
         final String interfaceName = attributes.getValue("interface");
 
         final ConfigBean bean = new ConfigBean(localName, interfaceName, scope(attributes.getValue("scope")), null, WebServiceFactory.class.getName(), "create", false);
@@ -26,7 +24,7 @@ public class WebServiceHandler extends BeanHandler {
         bean.getDirectAttributes().put("portQName", attributes.getValue("port-qname"));
         bean.getDirectAttributes().put("url", attributes.getValue("wsdl"));
 
-        return Arrays.asList(bean);
+        return bean;
     }
 
     private static String scope(final String scope) {

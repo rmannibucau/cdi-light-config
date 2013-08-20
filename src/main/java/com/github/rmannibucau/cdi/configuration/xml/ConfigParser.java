@@ -2,6 +2,7 @@ package com.github.rmannibucau.cdi.configuration.xml;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.PropertyHandler;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.WebServiceHandler;
 import org.xml.sax.Attributes;
@@ -15,25 +16,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 public final class ConfigParser extends DefaultHandler {
     private static final SAXParserFactory FACTORY = SAXParserFactory.newInstance();
-    private static final NamespaceHandler[] HANDLERS;
+    private static final Map<String, NamespaceHandler> HANDLERS;
     static {
         FACTORY.setNamespaceAware(true);
         FACTORY.setValidating(false);
 
         // default handlers
-        final Collection<NamespaceHandler<?>> handlers = new ArrayList<NamespaceHandler<?>>(5);
+        HANDLERS = new HashMap<String, NamespaceHandler>(5);
             // defaults
-        handlers.add(new PropertyHandler());
-        handlers.add(new WebServiceHandler());
+        HANDLERS.put("property", new PropertyHandler());
+        HANDLERS.put("webservice", new WebServiceHandler());
             // extensions
         for (final NamespaceHandler handler : ServiceLoader.load(NamespaceHandler.class)) {
-            handlers.add(handler);
+            HANDLERS.put(handler.supportedUri(), handler);
         }
-        HANDLERS = handlers.toArray(new NamespaceHandler<?>[handlers.size()]);
     }
 
     private static interface Level {
@@ -85,7 +87,11 @@ public final class ConfigParser extends DefaultHandler {
                 for (int i = 0; i < attributes.getLength(); i++) {
                     final String attrUri = attributes.getURI(i);
                     if (attrUri != null && !attrUri.isEmpty()) {
-                        handle(attrUri, attributes.getLocalName(i), attributes.getValue(i));
+                        final NamespaceHandler handler = HANDLERS.get(attrUri);
+                        if (handler != null) {
+                            handler.decorate(bean, attributes.getLocalName(i), attributes.getValue(i));
+                            break;
+                        }
                     }
                 }
             } else if (level == Level.ATTRIBUTE) {
@@ -99,18 +105,12 @@ public final class ConfigParser extends DefaultHandler {
             }
             level++;
         } else {
-            handle(uri, localName, attributes);
-        }
-    }
-
-    private <T> void handle(final String uri, final String key, final T value) {
-        for (final NamespaceHandler handler : HANDLERS) {
-            if (handler.support(uri)) {
-                final Collection<ConfigBean> toAdd = handler.parse(bean, key, value);
-                if (toAdd != null) {
-                    beans.addAll(toAdd);
+            final NamespaceHandler handler = HANDLERS.get(uri);
+            if (handler != null) {
+                final ConfigBean bean = handler.createBean(localName, attributes);
+                if (bean != null) {
+                    beans.add(bean);
                 }
-                break;
             }
         }
     }
