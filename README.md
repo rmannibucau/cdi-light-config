@@ -19,28 +19,28 @@ Here are the main use cases in a sample cdi-configuration.xml:
 ```xml
 <?xml version="1.0"?>
 <cdi-beans>
-  <foo class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean1">
+  <foo class="org.superbiz.ABean1">
     <attributeBean1>bean1</attributeBean1>
     <bean2><bar /></bean2>
   </foo>
 
-  <bar class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2" scope="application">
+  <bar class="org.superbiz.ABean2" scope="application">
     <attributeBean2>bean2</attributeBean2>
   </bar>
 
-  <qualified class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
-             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$MyNamed" />
+  <qualified class="org.superbiz.ABean2"
+             qualifier="org.superbiz.MyNamed" />
 
-  <simpleBean class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean2"
-             qualifier="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Simple" />
+  <simpleBean class="org.superbiz.ABean2"
+             qualifier="org.superbiz.Simple" />
 
-  <fromFactory class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean3"
-              factory-class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$Factory"
+  <fromFactory class="org.superbiz.ABean3"
+              factory-class="org.superbiz.Factory"
               qualifier="">
     <name>factory</name>
   </fromFactory>
   <constructor use-constructor="true"
-               class="com.github.rmannibucau.cdi.test.configuration.ConfigurationTest$ABean4">
+               class="org.superbiz.ABean4">
     <value>constructor</value>
     <integer>1</integer>
   </constructor>
@@ -101,13 +101,13 @@ For these types use a comma separated values (CSV) format. For instance:
 ```xml
 <?xml version="1.0"?>
 <cdi-beans>
-  <array class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ArrayBean">
+  <array class="org.superbiz.ArrayBean">
     <array>1,2,3</array>
   </array>
-  <list class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$ListBean">
+  <list class="org.superbiz.ListBean">
     <list>1,2,3</list>
   </list>
-  <set class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$SetBean">
+  <set class="org.superbiz.SetBean">
     <set>1,2,3</set>
   </set>
 </cdi-beans>
@@ -123,7 +123,7 @@ and equal separator for keys/values:
 ```xml
 <?xml version="1.0"?>
 <cdi-beans>
-  <map class="com.github.rmannibucau.cdi.test.configuration.MapListArrayConfigurationTest$MapBean">
+  <map class="org.superbiz.MapBean">
     <map>1=v1,2=v2,3=v3</map>
   </map>
 </cdi-beans>
@@ -164,9 +164,8 @@ The first one will be used to add beans from a tag (same level as bean ones) and
 ```xml
 <?xml version="1.0"?>
 <cdi-beans xmlns:set="set">
-  <set:mySet type="java.lang.Integer" item-0="0" item-1="2" item-2="4" item-3="4" />
+  <set:mySet type="java.lang.Integer" item-0="0" item-1="2" item-2="4" />
 </cdi-beans>
-
 ```
 
 ### map
@@ -179,8 +178,10 @@ The first one will be used to add beans from a tag (same level as bean ones) and
              key-1="1" value-1="2"
              key-2="2" value-2="4" />
 </cdi-beans>
-
 ```
+
+keys and values are matched using the index after `key-` or `value-`. It allows
+keys/values which are not xml compliant.
 
 ### webservice
 
@@ -192,8 +193,9 @@ The first one will be used to add beans from a tag (same level as bean ones) and
            port-qname="{http://configuration.test.cdi.rmannibucau.github.com/}MyWebServicePort"
            wsdl="http://webservice.domain.com:8080/MyWebService?wsdl" />
 </cdi-beans>
-
 ```
+
+`port-name` is optional.
 
 ### lookup
 
@@ -205,6 +207,8 @@ The first one will be used to add beans from a tag (same level as bean ones) and
                   java.naming.factory.initial="org.apache.openejb.core.LocalInitialContextFactory" />
 </cdi-beans>
 ```
+
+All properties of the initial context can be set as attributes.
 
 ### properties
 
@@ -224,7 +228,7 @@ To be more concise you can set properties inline using property namespace:
 ```xml
 <?xml version="1.0"?>
 <cdi-beans xmlns:p="property">
-  <inline class="com.github.rmannibucau.cdi.test.configuration.InlineConfigurationTest$Inline"
+  <inline class="org.superbiz.Inline"
           p:value="foo" />
 </cdi-beans>
 ```
@@ -235,11 +239,11 @@ Note: for the value you can use `ref:name` to reference the bean with the name `
 
 # Basic interpolation
 
-Thanks to Apache DeltaSpike `org.apache.deltaspike.core.spi.config.ConfigSource` you can interpolate some values.
+Thanks to Apache DeltaSpike `org.apache.deltaspike.core.spi.config.ConfigSource` SPI you can interpolate some values.
 
-By default `META-INF/apache-deltaspike.properties` is read but you can add all the `ConfigSource` you want.
+By default `META-INF/apache-deltaspike.properties` is read but you can add all the `ConfigSource` implementations you want.
 
-Once you value configured it can be used in `cdi-configuration.xml`:
+Once your value is configured it can be used in `cdi-configuration.xml`:
 
 ```xml
 <?xml version="1.0"?>
@@ -263,5 +267,5 @@ Once you value configured it can be used in `cdi-configuration.xml`:
 </cdi-beans>
 ```
 
-`init-method` and `destroy-method` defines a way to initialize and cleanup a bean. When set on a bean using a factory
-it will apply on the factory (and you'll have to call the bean hooks in the factory hooks if you need it.
+`init-method` and `destroy-method` define a way to initialize and cleanup a bean. When set on a bean using a factory
+it will apply on the factory (and you'll have to call the bean hooks in the factory hooks if you need it).
