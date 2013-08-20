@@ -129,7 +129,73 @@ and equal separator for keys/values:
 </cdi-beans>
 ```
 
-# Inline property set
+# Extensibility
+
+Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler`.
+
+You'll basically use the child `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandlerSupport` since
+`NamespaceHandler` supports two kind of handling: attribute handling like properties and bean handling (shortcut to create a bean).
+`NamespaceHandlerSupport` just throw an exception if the handler is used for a part it shouldn't handle.
+
+The first one will be used to add beans from a tag (same level as bean ones) and the second add add attributes from inline tags (as property one).
+
+
+## Default available handlers
+### array
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:array="array">
+  <array:myArray type="java.lang.Integer" item-0="0" item-1="2" item-2="4" />
+</cdi-beans>
+```
+
+### list
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:list="list">
+  <list:myList type="java.lang.Integer" item-0="0" item-1="2" item-2="4" />
+</cdi-beans>
+```
+
+### set
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:set="set">
+  <set:mySet type="java.lang.Integer" item-0="0" item-1="2" item-2="4" item-3="4" />
+</cdi-beans>
+
+```
+
+### map
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:map="map">
+  <map:myMap key-type="java.lang.String" value-type="java.lang.Integer"
+             key-0="0" value-0="0"
+             key-1="1" value-1="2"
+             key-2="2" value-2="4" />
+</cdi-beans>
+
+```
+
+### webservice
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:ws="webservice">
+  <ws:myWs interface="org.superbiz.MyWebService"
+           service-qname="{http://configuration.test.cdi.rmannibucau.github.com/}MyWebServiceService"
+           port-qname="{http://configuration.test.cdi.rmannibucau.github.com/}MyWebServicePort"
+           wsdl="http://webservice.domain.com:8080/MyWebService?wsdl" />
+</cdi-beans>
+
+```
+
+### property
 
 To be more concise you can set properties inline using property namespace:
 
@@ -144,24 +210,3 @@ To be more concise you can set properties inline using property namespace:
 Just add `xmlns:p="property"` and prefix inline your properties name by this namespace (`p`).
 
 Note: for the value you can use `ref:name` to reference the bean with the name `name`.
-
-# Extensibility
-
-Some basic extensibility is supported through interface `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler`.
-
-You'll basically use the child `com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandlerSupport` since
-`NamespaceHandler` supports two kind of handling: attribute handling like properties and bean handling (shortcut to create a bean).
-`NamespaceHandlerSupport` just throw an exception if the handler is used for a part it shouldn't handle.
-
-The first one will be used to add beans from a tag (same level as bean ones) and the second add add attributes from inline tags (as property one).
-
-A sample is provided through the webservice client handler. it allows you to create webservice clients inline:
-
-```xml
-<?xml version="1.0"?>
-<cdi-beans xmlns:ws="webservice">
-  <ws:myWs interface="com.github.rmannibucau.cdi.test.configuration.WebServiceConfigurationTest$WS"
-           service-qname="{http://configuration.test.cdi.rmannibucau.github.com/}WSImplService"
-           wsdl="http://127.0.0.1:4204/webservice-namespace/WSImpl?wsdl" /> <!-- port-qname optional -->
-</cdi-beans>
-```
