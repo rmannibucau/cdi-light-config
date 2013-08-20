@@ -3,16 +3,23 @@ package com.github.rmannibucau.cdi.configuration.factory;
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
 import com.github.rmannibucau.cdi.loader.ClassLoaders;
+import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.beans.Introspector;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import static com.github.rmannibucau.cdi.configuration.factory.Converter.convertTo;
@@ -20,20 +27,51 @@ import static com.github.rmannibucau.cdi.configuration.factory.Converter.convert
 public class ObjectFactory<T> {
     private static final Logger LOGGER = Logger.getLogger(ObjectFactory.class.getName());
 
+    private static final boolean HOOK_ACTIVATED = "true".equalsIgnoreCase(ConfigResolver.getPropertyValue("cdi.config.hooks", "false"));
+
     private final ConfigBean model;
     private final Factory<T> factory;
+    private final Collection<Method> postConstructs = new CopyOnWriteArrayList<Method>();
+    private final Collection<Method> preDestroys = new CopyOnWriteArrayList<Method>();
 
     public ObjectFactory(final ConfigBean bean) {
         model = bean;
         factory = findFactory();
+
+        final Class<?> clazz = factory.beanClass();
+        for (final Method m : new Method[] { find(PostConstruct.class, clazz), find(bean.getInitMethod(), clazz) }) {
+            if (m != null) {
+                postConstructs.add(m);
+            }
+        }
+        for (final Method m : new Method[] { find(PreDestroy.class, clazz), find(bean.getDestroyMethod(), clazz) }) {
+            if (m != null) {
+                preDestroys.add(m);
+            }
+        }
     }
 
     public T create() {
-        return factory.create();
+        final T instance = factory.create();
+        for (final Method postConstruct : postConstructs) {
+            try {
+                postConstruct.invoke(instance);
+            } catch (final Exception e) {
+                throw new ConfigurationException(e);
+            }
+        }
+        return instance;
     }
 
-    public Class<?> targetClass() {
-        return factory.beanClass();
+    public void destroy(final T instance) {
+        for (final Method preDestroy : preDestroys) {
+            try {
+                preDestroy.invoke(instance);
+            } catch (final Exception e) {
+                throw new ConfigurationException(e);
+            }
+        }
+        factory.destroy(instance);
     }
 
     private Factory<T> findFactory() {
@@ -105,6 +143,7 @@ public class ObjectFactory<T> {
 
     protected static interface Factory<T> {
         T create();
+        void destroy(T instance);
         Class<?> beanClass();
     }
 
@@ -152,6 +191,11 @@ public class ObjectFactory<T> {
             } catch (final Exception e) {
                 throw new ConfigurationException(e);
             }
+        }
+
+        @Override
+        public void destroy(final T instance) {
+            // no-op
         }
 
         @Override
@@ -218,6 +262,11 @@ public class ObjectFactory<T> {
         }
 
         @Override
+        public void destroy(final T instance) {
+            // no-op
+        }
+
+        @Override
         public Class<?> beanClass() {
             return clazz;
         }
@@ -251,7 +300,8 @@ public class ObjectFactory<T> {
     protected static class MethodFactory<T> implements Factory<T> {
         private final boolean staticFactory;
         private final Method method;
-        private final NewFactory<Object> delegate;
+        private final ObjectFactory<Object> delegate;
+        private final Map<Object, Object> factoryByInstance = new ConcurrentHashMap<Object, Object>();
 
         public MethodFactory(final ConfigBean mainBean, final boolean staticFactory, final Method method) {
             this.staticFactory = staticFactory;
@@ -261,25 +311,38 @@ public class ObjectFactory<T> {
             if (staticFactory) {
                 this.delegate = null;
             } else {
-                final ConfigBean bean = new ConfigBean(null, mainBean.getFactoryClass(), null, null, null, null, false);
+                final ConfigBean bean = new ConfigBean(null, mainBean.getFactoryClass(), null, null, null, null, mainBean.getInitMethod(), mainBean.getDestroyMethod(), false);
                 bean.getDirectAttributes().putAll(mainBean.getDirectAttributes());
                 bean.getRefAttributes().putAll(mainBean.getRefAttributes());
-                this.delegate = new NewFactory<Object>(bean);
+                this.delegate = new ObjectFactory<Object>(bean);
             }
         }
 
         @Override
         public T create() {
             try {
-                final Object factoryInstance;
                 if (staticFactory) {
-                    factoryInstance = null;
-                } else {
-                    factoryInstance = delegate.create();
+                    return (T) method.invoke(null);
                 }
-                return (T) method.invoke(factoryInstance);
+
+                final Object factoryInstance = delegate.create();
+                final T instance = (T) method.invoke(factoryInstance);
+                factoryByInstance.put(instance, factoryInstance);
+                return instance;
             } catch (final Exception e) {
                 throw new ConfigurationException(e);
+            }
+        }
+
+        @Override
+        public void destroy(final T instance) {
+            if (staticFactory || instance == null) {
+                return;
+            }
+
+            final Object factory = factoryByInstance.remove(instance);
+            if (factory != null) {
+                delegate.destroy(factory);
             }
         }
 
@@ -287,5 +350,35 @@ public class ObjectFactory<T> {
         public Class<?> beanClass() {
             return method.getReturnType();
         }
+    }
+
+    private static Method find(final Class<? extends Annotation> annotation, final Class<?> clazz) {
+        if (!HOOK_ACTIVATED) {
+            return null;
+        }
+
+        Class<?> current = clazz;
+        while (current != null && !Object.class.equals(current)) {
+            for (final Method m : current.getDeclaredMethods()) {
+                if (m.getAnnotation(annotation) != null) {
+                    return m;
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return null;
+    }
+
+    private static Method find(final String name, final Class<?> clazz) {
+        Class<?> current = clazz;
+        while (current != null && !Object.class.equals(current)) {
+            for (final Method m : current.getDeclaredMethods()) {
+                if (m.getName().equals(name)) {
+                    return m;
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return null;
     }
 }

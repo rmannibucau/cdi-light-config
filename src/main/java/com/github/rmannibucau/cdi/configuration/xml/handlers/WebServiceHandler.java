@@ -19,7 +19,7 @@ public class WebServiceHandler extends NamespaceHandlerSupport {
     public ConfigBean createBean(final String localName, final Attributes attributes) {
         final String interfaceName = attributes.getValue("interface");
 
-        final ConfigBean bean = new ConfigBean(localName, interfaceName, attributes.getValue("scope"), attributes.getValue("qualifier"), WebServiceFactory.class.getName(), "create", false);
+        final ConfigBean bean = new ConfigBean(localName, interfaceName, attributes.getValue("scope"), attributes.getValue("qualifier"), WebServiceFactory.class.getName(), "create", null, null, false);
         bean.getDirectAttributes().put("interfaceName", interfaceName);
         bean.getDirectAttributes().put("serviceQName", attributes.getValue("service-qname"));
         bean.getDirectAttributes().put("portQName", attributes.getValue("port-qname"));

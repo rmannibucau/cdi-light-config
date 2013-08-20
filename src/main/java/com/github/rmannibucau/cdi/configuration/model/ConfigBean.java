@@ -14,17 +14,19 @@ public class ConfigBean {
     private final String factoryMethod;
     private final String scope;
     private final String qualifier;
+    private final String initMethod;
+    private final String destroyMethod;
     private final boolean constructor;
     private final Map<String, String> directAttributes = new HashMap<String, String>();
     private final Map<String, String> refAttributes = new HashMap<String, String>();
     private final Collection<String> attributeOrder = new CopyOnWriteArrayList<String>();
 
     public ConfigBean(final String name, final String classname, final String scope) {
-        this(name, classname, scope, null, null, null, false);
+        this(name, classname, scope, null, null, null, null, null, false);
     }
 
     public ConfigBean(final String name, final String classname, final String scope, final String qualifier,
-                      final String factoryClass, final String factoryMethod,
+                      final String factoryClass, final String factoryMethod, final String init, final String destroy,
                       final boolean constructor) {
         this.name = name;
         this.classname = classname;
@@ -37,6 +39,8 @@ public class ConfigBean {
         } else {
             this.factoryMethod = "create";
         }
+        this.initMethod = init;
+        this.destroyMethod = destroy;
     }
 
     public String getName() {
@@ -49,6 +53,14 @@ public class ConfigBean {
 
     public Collection<String> getTypeParameters() {
         return typeParameters;
+    }
+
+    public String getInitMethod() {
+        return initMethod;
+    }
+
+    public String getDestroyMethod() {
+        return destroyMethod;
     }
 
     public String getFactoryClass() {

@@ -94,6 +94,7 @@ public final class ConfigParser extends DefaultHandler {
 
                 bean = new ConfigBean(localName, classname, scope, qualifier,
                     attributes.getValue("factory-class"), attributes.getValue("factory-method"),
+                    attributes.getValue("init-method"), attributes.getValue("destroy-method"),
                     useConstructor);
 
                 for (int i = 0; i < attributes.getLength(); i++) {

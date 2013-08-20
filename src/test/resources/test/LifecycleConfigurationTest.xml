@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<cdi-beans>
+  <lifecycle class="com.github.rmannibucau.cdi.test.configuration.LifecycleConfigurationTest$Lifecycle"
+             init-method="init"
+             destroy-method="destroy" />
+  <lifecycleFactory class="com.github.rmannibucau.cdi.test.configuration.LifecycleConfigurationTest$Lifecycle"
+             factory-class="com.github.rmannibucau.cdi.test.configuration.LifecycleConfigurationTest$LifecycleFactory"
+             init-method="initFactory"
+             destroy-method="destroyFactory" />
+</cdi-beans>

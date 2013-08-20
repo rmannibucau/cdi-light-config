@@ -23,7 +23,7 @@ public class PropertiesHandler extends NamespaceHandlerSupport {
     @Override
     public ConfigBean createBean(final String localName, final Attributes attributes) {
         final ConfigBean bean = new ConfigBean(localName, Properties.class.getName(), "dependent", attributes.getValue("qualifier"),
-                                                PropertiesFactory.class.getName(), "create", false);
+                                                PropertiesFactory.class.getName(), "create", null, null, false);
         bean.getDirectAttributes().put("path", attributes.getValue("path"));
         bean.getDirectAttributes().put("cached", Boolean.toString("true".equalsIgnoreCase(attributes.getValue("cached"))));
         return bean;

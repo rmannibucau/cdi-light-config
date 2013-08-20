@@ -19,7 +19,7 @@ public class LookupHandler extends NamespaceHandlerSupport {
     public ConfigBean createBean(final String localName, final Attributes attributes) {
         final ConfigBean bean = new ConfigBean(localName, attributes.getValue("type"),
                                                 attributes.getValue("scope"), attributes.getValue("qualifier"),
-                                                LookupFactory.class.getName(), "create", false);
+                                                LookupFactory.class.getName(), "create", null, null, false);
 
         for (int i = 0; i < attributes.getLength(); i++) {
             bean.getDirectAttributes().put(attributes.getLocalName(i), attributes.getValue(i));

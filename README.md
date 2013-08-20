@@ -248,3 +248,20 @@ Once you value configured it can be used in `cdi-configuration.xml`:
        p:message="${value}" />
 </cdi-beans>
 ```
+# Hook methods
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans>
+  <lifecycle class="org.superbiz.Lifecycle"
+             init-method="init"
+             destroy-method="destroy" />
+  <lifecycleFactory class="org.superbiz.Lifecycle"
+             factory-class="org.superbiz.LifecycleFactory"
+             init-method="initFactory"
+             destroy-method="destroyFactory" />
+</cdi-beans>
+```
+
+`init-method` and `destroy-method` defines a way to initialize and cleanup a bean. When set on a bean using a factory
+it will apply on the factory (and you'll have to call the bean hooks in the factory hooks if you need it.
