@@ -195,6 +195,28 @@ The first one will be used to add beans from a tag (same level as bean ones) and
 
 ```
 
+### lookup
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:lookup="lookup">
+  <lookup:service type="corg.superbiz.MyService"
+                  jndi="java:global/myapp/mymodule/MyService"
+                  java.naming.factory.initial="org.apache.openejb.core.LocalInitialContextFactory" />
+</cdi-beans>
+```
+
+### properties
+
+```xml
+<?xml version="1.0"?>
+<cdi-beans xmlns:prop="properties">
+  <prop:props path="ab.properties" />
+</cdi-beans>
+```
+
+Read either file or classpath resource `ab.properties`.
+
 ### property
 
 To be more concise you can set properties inline using property namespace:

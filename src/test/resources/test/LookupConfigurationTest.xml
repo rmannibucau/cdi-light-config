@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:lookup="lookup">
+  <lookup:service type="com.github.rmannibucau.cdi.test.configuration.LookupConfigurationTest$MyService"
+                  jndi="java:global/LookupConfigurationTest/LookupConfigurationTest/MyService"
+                  java.naming.factory.initial="org.apache.openejb.core.LocalInitialContextFactory" />
+</cdi-beans>

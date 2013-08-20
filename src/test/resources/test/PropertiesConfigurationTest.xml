@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<cdi-beans xmlns:prop="properties">
+  <prop:props path="ab.properties" />
+</cdi-beans>

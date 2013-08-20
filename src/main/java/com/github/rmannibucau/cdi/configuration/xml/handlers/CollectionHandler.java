@@ -19,7 +19,9 @@ public abstract class CollectionHandler extends NamespaceHandlerSupport {
     public ConfigBean createBean(final String localName, final Attributes attributes) {
         final String type = parameterType(attributes.getValue("type"));
 
-        final ConfigBean bean = new ConfigBean(localName, getRawBeanType(type), scope(attributes.getValue("scope")), null, getFactory().getName(), "create", false);
+        final ConfigBean bean = new ConfigBean(localName, getRawBeanType(type),
+                                                attributes.getValue("scope"), attributes.getValue("qualifier"),
+                                                getFactory().getName(), "create", false);
         for (int i = 0; i < attributes.getLength(); i++) {
             bean.getDirectAttributes().put(attributes.getLocalName(i), attributes.getValue(i));
         }

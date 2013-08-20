@@ -4,15 +4,13 @@ import com.github.rmannibucau.cdi.configuration.factory.SetterFallback;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
 import org.xml.sax.Attributes;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import static com.github.rmannibucau.cdi.configuration.factory.Converter.convertTo;
+import static com.github.rmannibucau.cdi.configuration.qualifier.Qualifiers.selectQualifier;
+import static com.github.rmannibucau.cdi.configuration.scope.Scopes.toScopeClass;
 
 public class MapHandler extends CollectionHandler {
     protected static final String KEY_PREFIX = "key-";
@@ -25,7 +23,7 @@ public class MapHandler extends CollectionHandler {
 
     @Override
     public ConfigBean createBean(final String localName, final Attributes attributes) {
-        final ConfigBean bean = new ConfigBean(localName, Map.class.getName(), scope(attributes.getValue("scope")), null, MapFactory.class.getName(), "create", false);
+        final ConfigBean bean = new ConfigBean(localName, Map.class.getName(), attributes.getValue("scope"), attributes.getValue("qualifier"), MapFactory.class.getName(), "create", false);
         for (int i = 0; i < attributes.getLength(); i++) {
             final String name = attributes.getLocalName(i);
             if (!name.endsWith("-type")) {

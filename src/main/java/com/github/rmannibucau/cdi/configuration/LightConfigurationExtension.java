@@ -2,13 +2,11 @@ package com.github.rmannibucau.cdi.configuration;
 
 import com.github.rmannibucau.cdi.configuration.factory.ContextualFactory;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
-import com.github.rmannibucau.cdi.configuration.qualifier.NamedQualifier;
 import com.github.rmannibucau.cdi.configuration.xml.ConfigParser;
 import com.github.rmannibucau.cdi.loader.ClassLoaders;
 import com.github.rmannibucau.cdi.reflect.ParameterizedTypeImpl;
 import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.apache.deltaspike.core.util.bean.BeanBuilder;
-import org.apache.deltaspike.core.util.metadata.AnnotationInstanceProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
@@ -22,15 +20,15 @@ import javax.enterprise.inject.spi.Extension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
+
+import static com.github.rmannibucau.cdi.configuration.qualifier.Qualifiers.toQualifier;
+import static com.github.rmannibucau.cdi.configuration.scope.Scopes.toScope;
 
 public class LightConfigurationExtension implements Extension {
     private static final Logger LOGGER = Logger.getLogger(LightConfigurationExtension.class.getName());
@@ -81,48 +79,6 @@ public class LightConfigurationExtension implements Extension {
             params[i++] = classLoader.loadClass(type);
         }
         return new ParameterizedTypeImpl(base, params);
-    }
-
-    private Annotation toQualifier(final String qualifier, final String name) {
-        if (qualifier == null || "name".equals(qualifier)) {
-            return new NamedQualifier(name);
-        }
-        if (qualifier.isEmpty()) {
-            return null;
-        }
-
-        final Map<String, String> potentialAttributes = new HashMap<String, String>();
-        potentialAttributes.put("value", name);
-        potentialAttributes.put("name", name);
-
-        try {
-            return AnnotationInstanceProvider.of((Class<? extends Annotation>) ClassLoaders.tccl().loadClass(qualifier), potentialAttributes);
-        } catch (final ClassNotFoundException e) {
-            // no-op
-        }
-
-        throw new ConfigurationException("Can't find qualfier '" + qualifier + "'");
-    }
-
-    private Class<? extends Annotation> toScope(final String scope) {
-        if ("application".equalsIgnoreCase(scope)) {
-            return ApplicationScoped.class;
-        }
-        if ("session".equalsIgnoreCase(scope)) {
-            return SessionScoped.class;
-        }
-        if ("request".equalsIgnoreCase(scope)) {
-            return RequestScoped.class;
-        }
-        if ("dependent".equalsIgnoreCase(scope) || scope == null) {
-            return Dependent.class;
-        }
-        try {
-            return (Class<? extends Annotation>) ClassLoaders.tccl().loadClass(scope);
-        } catch (final ClassNotFoundException e) {
-            // no-op
-        }
-        throw new ConfigurationException("Unknown scope: " + scope);
     }
 
     void readAllConfigurations(final @Observes AfterBeanDiscovery abd, final BeanManager bm) {
