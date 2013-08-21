@@ -1,7 +1,7 @@
 package com.github.rmannibucau.cdi.configuration.scope;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
-import com.github.rmannibucau.cdi.loader.ClassLoaders;
+import com.github.rmannibucau.cdi.configuration.loader.ClassLoaders;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;

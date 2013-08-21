@@ -1,7 +1,6 @@
 package com.github.rmannibucau.cdi.configuration.xml.handlers;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class SetHandler extends CollectionHandler {

@@ -1,4 +1,4 @@
-package com.github.rmannibucau.cdi.reflect;
+package com.github.rmannibucau.cdi.configuration.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

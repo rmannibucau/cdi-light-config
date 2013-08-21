@@ -5,7 +5,6 @@
   <container qualifier="openejb" default="true">
     <configuration>
       <property name="properties">
-        openejb.embedded.remotable = true
         admin.disabled = true
         ejbd.disabled = true
         ejbds.disabled = true

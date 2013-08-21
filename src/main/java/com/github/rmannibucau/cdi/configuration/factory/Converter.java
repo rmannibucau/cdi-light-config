@@ -1,7 +1,7 @@
 package com.github.rmannibucau.cdi.configuration.factory;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
-import com.github.rmannibucau.cdi.loader.ClassLoaders;
+import com.github.rmannibucau.cdi.configuration.loader.ClassLoaders;
 import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 

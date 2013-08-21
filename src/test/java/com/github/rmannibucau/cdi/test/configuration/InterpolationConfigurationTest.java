@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import java.util.Collections;
 import java.util.Map;
 

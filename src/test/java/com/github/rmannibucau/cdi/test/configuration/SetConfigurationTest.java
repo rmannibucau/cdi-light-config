@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;

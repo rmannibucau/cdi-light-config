@@ -1,8 +1,8 @@
 package com.github.rmannibucau.cdi.configuration.xml.handlers;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
+import com.github.rmannibucau.cdi.configuration.loader.ClassLoaders;
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
-import com.github.rmannibucau.cdi.loader.ClassLoaders;
 import org.xml.sax.Attributes;
 
 import java.io.File;

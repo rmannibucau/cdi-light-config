@@ -1,7 +1,7 @@
 package com.github.rmannibucau.cdi.configuration.qualifier;
 
 import com.github.rmannibucau.cdi.configuration.ConfigurationException;
-import com.github.rmannibucau.cdi.loader.ClassLoaders;
+import com.github.rmannibucau.cdi.configuration.loader.ClassLoaders;
 import org.apache.deltaspike.core.util.metadata.AnnotationInstanceProvider;
 
 import java.lang.annotation.Annotation;

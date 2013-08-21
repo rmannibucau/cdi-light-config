@@ -17,6 +17,13 @@ public interface NamespaceHandler {
     void decorate(ConfigBean bean, String localName, String value);
 
     /**
+     * @param bean the bean to decorate
+     * @param localName the localName for the parsed subtag
+     * @param attributes the attributes
+     */
+    void decorate(ConfigBean bean, String localName, Attributes attributes);
+
+    /**
      * @param localName the localName for the bean
      * @param attributes the attributes of the bean
      * @return the bean to create

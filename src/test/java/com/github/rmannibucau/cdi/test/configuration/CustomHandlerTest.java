@@ -2,11 +2,10 @@ package com.github.rmannibucau.cdi.test.configuration;
 
 import com.github.rmannibucau.cdi.configuration.model.ConfigBean;
 import com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandler;
+import com.github.rmannibucau.cdi.configuration.xml.handlers.NamespaceHandlerSupport;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.xml.sax.Attributes;
@@ -43,15 +42,10 @@ public class CustomHandlerTest {
         }
     }
 
-    public static class CustomHandler implements NamespaceHandler {
+    public static class CustomHandler extends NamespaceHandlerSupport {
         @Override
         public String supportedUri() {
             return "custom";
-        }
-
-        @Override
-        public void decorate(final ConfigBean bean, final String localName, final String value) {
-            // no-op
         }
 
         @Override

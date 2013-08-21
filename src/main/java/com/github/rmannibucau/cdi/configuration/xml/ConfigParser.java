@@ -50,6 +50,8 @@ public final class ConfigParser extends DefaultHandler {
         }
     }
 
+    public static final String NAMESPACE_SCHEME = "cdi://";
+
     private static interface Level {
         static final int ROOT = 0;
         static final int BEAN = 1;
@@ -100,7 +102,7 @@ public final class ConfigParser extends DefaultHandler {
                 for (int i = 0; i < attributes.getLength(); i++) {
                     final String attrUri = attributes.getURI(i);
                     if (attrUri != null && !attrUri.isEmpty()) {
-                        final NamespaceHandler handler = HANDLERS.get(attrUri);
+                        final NamespaceHandler handler = findHandler(attrUri);
                         if (handler != null) {
                             handler.decorate(bean, attributes.getLocalName(i), attributes.getValue(i));
                             break;
@@ -116,16 +118,23 @@ public final class ConfigParser extends DefaultHandler {
                     defaultScope = "dependent";
                 }
             }
-            level++;
         } else {
-            final NamespaceHandler handler = HANDLERS.get(uri);
-            if (handler != null) {
-                final ConfigBean bean = handler.createBean(localName, attributes);
+            final NamespaceHandler handler = findHandler(uri);
+            if (handler == null) {
+                throw new IllegalArgumentException("Can't find any handler for namespace " + uri);
+            }
+
+            if (level == Level.BEAN) {
+                bean = handler.createBean(localName, attributes);
                 if (bean != null) {
                     beans.add(bean);
                 }
+            } else if (level > Level.BEAN) {
+                handler.decorate(bean, localName, attributes);
             }
         }
+
+        level++;
     }
 
     @Override
@@ -137,8 +146,9 @@ public final class ConfigParser extends DefaultHandler {
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
+        level--;
+
         if (isDefaultNamespace(uri)) {
-            level--;
             if (level == Level.BEAN) {
                 beans.add(bean);
                 bean = null;
@@ -168,5 +178,12 @@ public final class ConfigParser extends DefaultHandler {
         parser.parse(is, handler);
         return handler.beans;
 
+    }
+
+    private static NamespaceHandler findHandler(final String uri) {
+        if (uri.startsWith(NAMESPACE_SCHEME)) {
+            return HANDLERS.get(uri.substring(NAMESPACE_SCHEME.length()));
+        }
+        return HANDLERS.get(uri);
     }
 }

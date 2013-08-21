@@ -19,7 +19,7 @@ public class ConfigBean {
     private final boolean constructor;
     private final Map<String, String> directAttributes = new HashMap<String, String>();
     private final Map<String, String> refAttributes = new HashMap<String, String>();
-    private final Collection<String> attributeOrder = new CopyOnWriteArrayList<String>();
+    private final Collection<String> attributeOrder = new CopyOnWriteArrayList<String>(); // this one needs to be thread safe since used at runtime to create the instance
 
     public ConfigBean(final String name, final String classname, final String scope) {
         this(name, classname, scope, null, null, null, null, null, false);
@@ -93,5 +93,14 @@ public class ConfigBean {
 
     public Collection<String> getAttributeOrder() {
         return attributeOrder;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigBean{" +
+                "name='" + name + '\'' +
+                ", classname='" + classname + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+            '}';
     }
 }

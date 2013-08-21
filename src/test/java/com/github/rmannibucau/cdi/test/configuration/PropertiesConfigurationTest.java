@@ -7,10 +7,8 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
